@@ -46,7 +46,7 @@ public class GameController {
             return freeGame;
         } else {
             newPlayer.setDisc("x");
-            Board board = new Board(8, 7);
+            Board board = new Board(6, 9);
 
             int boardHeight = board.getHeight();
             int boardWidth = board.getWidth();
@@ -91,6 +91,11 @@ public class GameController {
         Game game = gameRepository.findById(gameId).orElse(null);
         if (game != null) {
             Map<String, List<String>> diskAdded = game.addDisc(column, name);
+            if (game.checkGameOver()){
+                game.setWinner(game.getTurnToken());
+                gameRepository.save(game);
+                return game;
+            }
             if (diskAdded != null) {
                 for (Map.Entry<String,String> entry : game.getPlayers().entrySet()) {
                     if (!entry.getKey().equals(name)) {

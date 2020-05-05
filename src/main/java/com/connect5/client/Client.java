@@ -76,9 +76,10 @@ public class Client {
 
         Game game = client.joinGame(userName);
         Scanner scan = new Scanner(System.in);
-        boolean gameOver = false;
-        while (!gameOver) {
+        String winner = null;
+        while (winner == null) {
             game = client.checkTurn(game.getId(), userName);
+            winner = game.getWinner();
             if (game != null) {
                 if (game.isFree()) {
                     System.out.println("Waiting for a second player");
@@ -91,12 +92,23 @@ public class Client {
                     System.out.print("Enter any column: ");
                     int column = scan.nextInt();
 
-                    game = client.makeMove(game, userName, Integer.valueOf(column));
-
-                    gameOver = game.isGameOver();
+                    boolean columnIsValid = game.validateColumn(column);
+                    if (columnIsValid) {
+                        game = client.makeMove(game, userName, Integer.valueOf(column));
+                        winner = game.getWinner();
+                    } else {
+                        System.out.println("That is an invalid column, please try again");
+                    }
+                } else {
+                    System.out.println("Waiting for a player to make a move.");
                 }
             }
             TimeUnit.SECONDS.sleep(3);
+        }
+        if (winner.equals(userName)) {
+            System.out.println("Well done, you won!");
+        } else {
+            System.out.println("I'm sorry, you lost!");
         }
         scan.close();
     }

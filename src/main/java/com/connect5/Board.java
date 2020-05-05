@@ -4,8 +4,8 @@ import java.util.*;
 
 public class Board {
 
-    private int width;
     private int height;
+    private int width;
     Map<String, List<String>> grid;
     private static final String defaultDisc = "*";
 
@@ -21,9 +21,9 @@ public class Board {
     }
 
     private void initBoard(){
-        for (int i = width - 1; i >= 0; i--) {
+        for (int i = height - 1; i >= 0; i--) {
             List<String> row = new ArrayList<String>();
-            for (int j = height - 1; j >= 0; j--) {
+            for (int j = width - 1; j >= 0; j--) {
                 row.add(defaultDisc);
             }
             this.grid.put(String.valueOf(i), row);

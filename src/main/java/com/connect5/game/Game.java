@@ -18,7 +18,9 @@ public class Game {
     private Map<String, String> players;
     private boolean free;
     private String turnToken;
-    private boolean gameOver;
+    private int numToConnect;
+    private String winner;
+
 
     public Game() {
         // Default constructor is required by AWS DynamoDB SDK
@@ -31,12 +33,13 @@ public class Game {
         this.players = player;
         this.free = true;
         this.turnToken = turnToken;
-        this.gameOver = false;
+        this.numToConnect = 3;
+        this.winner = null;
     }
 
     public Map<String, List<String>> addDisc (int column, String name) {
         String disc = this.getPlayerDisc(name);
-        for (int i = boardWidth - 1; i >= 0; i--) {
+        for (int i = boardHeight - 1; i >= 0; i--) {
             List<String> row = this.grid.get(String.valueOf(i));
             if (row.get(column).equals("*")) {
                 row.set(column, disc);
@@ -44,7 +47,131 @@ public class Game {
                 return this.grid;
             }
         }
-        return this.grid;
+        return null;
+    }
+
+    public boolean validateColumn (int column) {
+        for (int i = boardHeight - 1; i >= 0; i--) {
+            List<String> row = this.grid.get(String.valueOf(i));
+            if (row.get(column).equals("*")) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public boolean checkGameOver() {
+        return checkVertWin() || checkHorizonWin() || checkPosDiagWin() || checkNegDiagWin();
+    }
+
+    private boolean checkHorizonWin() {
+        String disc = this.getPlayerDisc(this.turnToken);
+        for (int i = boardHeight - 1; i >= 0; i--) {
+            List<String> row = this.grid.get(String.valueOf(i));
+            int discsInARow = 0;
+            for (int j = 0; j < row.size(); j++) {
+                if (row.get(j).equals(disc)) {
+                    discsInARow++;
+                } else {
+                    discsInARow = 0;
+                }
+                if (discsInARow == this.numToConnect) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    private boolean checkVertWin() {
+        String disc = this.getPlayerDisc(this.turnToken);
+        for (int j = 0; j < boardWidth; j++) {
+            int discsInARow = 0;
+            for (int i = boardHeight - 1; i >= 0; i--) {
+                List<String> row = this.grid.get(String.valueOf(i));
+                if (row.get(j).equals(disc)) {
+                    discsInARow++;
+                } else {
+                    discsInARow = 0;
+                }
+                if (discsInARow == this.numToConnect) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    private boolean checkPosDiagWin() {
+        String disc = this.getPlayerDisc(this.turnToken);
+        for (int row = this.numToConnect - 1; row < boardHeight; row++) {
+            int discsInARow = 0;
+            for (int col = 0; col < row + 1; col++) {
+                List<String> rowList = this.grid.get(String.valueOf(row - col));
+                if (rowList.get(col).equals(disc)) {
+                    discsInARow++;
+                } else {
+                    discsInARow = 0;
+                }
+                if (discsInARow == this.numToConnect) {
+                    return true;
+                }
+            }
+        }
+
+        for (int i = 1; i < boardWidth - (this.numToConnect - 1); i++) {
+            int discsInARow = 0;
+            for (int j = 0; j < boardHeight; j++) {
+                if ( (i + j) < boardHeight) {
+                    List<String> row = this.grid.get(String.valueOf((boardHeight - 1) - j));
+                    if (row.get(j+i).equals(disc)) {
+                        discsInARow++;
+                    } else {
+                        discsInARow = 0;
+                    }
+                    if (discsInARow == this.numToConnect) {
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
+    private boolean checkNegDiagWin() {
+        String disc = this.getPlayerDisc(this.turnToken);
+        for (int row = 0; row < boardHeight - this.numToConnect - 1; row++) {
+            int discsInARow = 0;
+            for (int col = 0; col < boardHeight - row; col++) {
+                List<String> rowList = this.grid.get(String.valueOf(row + col));
+                if (rowList.get(col).equals(disc)) {
+                    discsInARow++;
+                } else {
+                    discsInARow = 0;
+                }
+                if (discsInARow == this.numToConnect) {
+                    return true;
+                }
+            }
+        }
+
+        for (int i = 1; i < boardWidth - (this.numToConnect - 1); i++) {
+            int discsInARow = 0;
+            for (int j = 0; j < boardHeight; j++) {
+                if ( (i + j) < boardHeight) {
+                    List<String> row = this.grid.get(String.valueOf(j));
+                    if (row.get(j+i).equals(disc)) {
+                        discsInARow++;
+                    } else {
+                        discsInARow = 0;
+                    }
+                    if (discsInARow == this.numToConnect) {
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
     }
 
     @DynamoDBHashKey
@@ -119,11 +246,21 @@ public class Game {
         return this.players.get(name);
     }
 
-    public boolean isGameOver() {
-        return gameOver;
+    @DynamoDBAttribute
+    public int getNumToConnect() {
+        return numToConnect;
     }
 
-    public void setGameOver(boolean gameOver) {
-        this.gameOver = gameOver;
+    public void setNumToConnect(int numToConnect) {
+        this.numToConnect = numToConnect;
+    }
+
+    @DynamoDBAttribute
+    public String getWinner() {
+        return winner;
+    }
+
+    public void setWinner(String winner) {
+        this.winner = winner;
     }
 }
