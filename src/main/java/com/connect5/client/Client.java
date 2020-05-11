@@ -5,9 +5,7 @@ import com.connect5.player.Player;
 import org.springframework.http.*;
 import org.springframework.web.client.RestTemplate;
 
-import java.awt.print.Book;
 import java.io.BufferedReader;
-import java.io.Console;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.*;

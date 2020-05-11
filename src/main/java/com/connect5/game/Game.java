@@ -39,11 +39,11 @@ public class Game {
 
     public Map<String, List<String>> addDisc (int column, String name) {
         String disc = this.getPlayerDisc(name);
-        for (int i = boardHeight - 1; i >= 0; i--) {
-            List<String> row = this.grid.get(String.valueOf(i));
+        for (int rowNum = boardHeight - 1; rowNum >= 0; rowNum--) {
+            List<String> row = this.grid.get(String.valueOf(rowNum));
             if (row.get(column).equals("*")) {
                 row.set(column, disc);
-                this.grid.put(String.valueOf(i), row);
+                this.grid.put(String.valueOf(rowNum), row);
                 return this.grid;
             }
         }
@@ -51,8 +51,8 @@ public class Game {
     }
 
     public boolean validateColumn (int column) {
-        for (int i = boardHeight - 1; i >= 0; i--) {
-            List<String> row = this.grid.get(String.valueOf(i));
+        for (int rowNum = boardHeight - 1; rowNum >= 0; rowNum--) {
+            List<String> row = this.grid.get(String.valueOf(rowNum));
             if (row.get(column).equals("*")) {
                 return true;
             }
@@ -66,11 +66,11 @@ public class Game {
 
     private boolean checkHorizonWin() {
         String disc = this.getPlayerDisc(this.turnToken);
-        for (int i = boardHeight - 1; i >= 0; i--) {
-            List<String> row = this.grid.get(String.valueOf(i));
+        for (int rowNum = boardHeight - 1; rowNum >= 0; rowNum--) {
+            List<String> row = this.grid.get(String.valueOf(rowNum));
             int discsInARow = 0;
-            for (int j = 0; j < row.size(); j++) {
-                if (row.get(j).equals(disc)) {
+            for (int colNum = 0; colNum < row.size(); colNum++) {
+                if (row.get(colNum).equals(disc)) {
                     discsInARow++;
                 } else {
                     discsInARow = 0;
@@ -85,11 +85,11 @@ public class Game {
 
     private boolean checkVertWin() {
         String disc = this.getPlayerDisc(this.turnToken);
-        for (int j = 0; j < boardWidth; j++) {
+        for (int colNum = 0; colNum < boardWidth; colNum++) {
             int discsInARow = 0;
-            for (int i = boardHeight - 1; i >= 0; i--) {
-                List<String> row = this.grid.get(String.valueOf(i));
-                if (row.get(j).equals(disc)) {
+            for (int rowNum = boardHeight - 1; rowNum >= 0; rowNum--) {
+                List<String> row = this.grid.get(String.valueOf(rowNum));
+                if (row.get(colNum).equals(disc)) {
                     discsInARow++;
                 } else {
                     discsInARow = 0;
@@ -119,12 +119,12 @@ public class Game {
             }
         }
 
-        for (int i = 1; i < boardWidth - (this.numToConnect - 1); i++) {
+        for (int col = 1; col < boardWidth - (this.numToConnect - 1); col++) {
             int discsInARow = 0;
-            for (int j = 0; j < boardHeight; j++) {
-                if ( (i + j) < boardHeight) {
-                    List<String> row = this.grid.get(String.valueOf((boardHeight - 1) - j));
-                    if (row.get(j+i).equals(disc)) {
+            for (int row = 0; row < boardHeight; row++) {
+                if ( (col + row) < boardHeight) {
+                    List<String> rowList = this.grid.get(String.valueOf((boardHeight - 1) - row));
+                    if (rowList.get(row+col).equals(disc)) {
                         discsInARow++;
                     } else {
                         discsInARow = 0;
@@ -155,12 +155,12 @@ public class Game {
             }
         }
 
-        for (int i = 1; i < boardWidth - (this.numToConnect - 1); i++) {
+        for (int col = 1; col < boardWidth - (this.numToConnect - 1); col++) {
             int discsInARow = 0;
-            for (int j = 0; j < boardHeight; j++) {
-                if ( (i + j) < boardHeight) {
-                    List<String> row = this.grid.get(String.valueOf(j));
-                    if (row.get(j+i).equals(disc)) {
+            for (int row = 0; row < boardHeight; row++) {
+                if ( (col + row) < boardHeight) {
+                    List<String> rowList = this.grid.get(String.valueOf(row));
+                    if (rowList.get(row+col).equals(disc)) {
                         discsInARow++;
                     } else {
                         discsInARow = 0;

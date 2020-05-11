@@ -1,12 +1,10 @@
 package com.connect5;
 
-import com.amazonaws.services.dynamodbv2.model.ResourceNotFoundException;
 import com.connect5.game.Game;
 import com.connect5.game.GameRepository;
 import com.connect5.player.Player;
 import com.connect5.player.PlayerRepository;
 import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -22,8 +20,8 @@ public class GameController {
     GameRepository gameRepository;
 
     @GetMapping(value = "/{name}", produces = "application/json")
-    public List<Player> getPlayer(@PathVariable String name) {
-        return playerRepository.findByName(name);
+    public Player getPlayer(@PathVariable String name) {
+        return playerRepository.findFirstByName(name);
     }
 
     @PostMapping(value = "joinGame/{name}", consumes = "application/json", produces = "application/json")
@@ -51,22 +49,21 @@ public class GameController {
             int boardHeight = board.getHeight();
             int boardWidth = board.getWidth();
             Map<String, List<String>> grid = board.getGrid();
-            Map<String, String> p1Map = new HashMap<String, String>();
+            Map<String, String> p1Map = new HashMap<>();
             p1Map.put(newPlayer.getName(), newPlayer.getDisc());
 
             String turnToken = newPlayer.getName();
 
             Game newGame = new Game(boardHeight, boardWidth, grid, p1Map, turnToken);
 
-            gameRepository.save(newGame);
+            newGame = gameRepository.save(newGame);
 
             System.out.println("newGame " + newGame.getId());
             Optional<Game> gameQuery = gameRepository.findById(newGame.getId());
+            Game presentGame = gameQuery.isPresent() ? gameQuery.get() : null;
 
             System.out.println();
-            if (gameQuery.get() != null) {
-                System.out.println("Queried object: " + basicGson.toJson(gameQuery.get()));
-            }
+            System.out.println("Queried object: " + basicGson.toJson(presentGame));
 
             Iterable<Game> games = gameRepository.findAll();
             for (Game gameObject : games) {

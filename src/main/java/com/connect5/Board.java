@@ -22,7 +22,7 @@ public class Board {
 
     private void initBoard(){
         for (int i = height - 1; i >= 0; i--) {
-            List<String> row = new ArrayList<String>();
+            List<String> row = new ArrayList<>();
             for (int j = width - 1; j >= 0; j--) {
                 row.add(defaultDisc);
             }

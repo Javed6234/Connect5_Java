@@ -10,4 +10,6 @@ import java.util.Optional;
 public interface PlayerRepository extends CrudRepository<Player, String> {
     List<Player> findByName(String name);
     Optional<Player> findById(String id);
+
+    Player findFirstByName(String name);
 }

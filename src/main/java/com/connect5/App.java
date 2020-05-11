@@ -86,7 +86,7 @@ public class App implements CommandLineRunner{
             System.out.println("List object: " + new Gson().toJson(playerObject));
         }
 
-        Board board = new Board(8, 7);
+        Board board = new Board(6, 9);
         int boardHeight = board.getHeight();
         int boardWidth = board.getWidth();
         Map<String, List<String>> grid = board.getGrid();
