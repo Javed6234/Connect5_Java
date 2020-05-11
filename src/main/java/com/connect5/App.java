@@ -1,6 +1,5 @@
 package com.connect5;
 
-
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDB;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapper;
 import com.amazonaws.services.dynamodbv2.model.CreateTableRequest;
@@ -14,9 +13,8 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
-import org.springframework.boot.WebApplicationType;
+import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.builder.SpringApplicationBuilder;
 
 import java.util.HashMap;
 import java.util.List;
@@ -27,7 +25,7 @@ import java.util.Optional;
 public class App implements CommandLineRunner{
 
     public static void main(String[] args) {
-        new SpringApplicationBuilder(App.class).web(WebApplicationType.SERVLET).run(args);
+        SpringApplication.run(App.class, args);
     }
 
     @Autowired

@@ -31,7 +31,7 @@ import java.util.*;
 @SpringBootTest
 @AutoConfigureMockMvc
 @ComponentScan(basePackages = "com.connect5")
-public class GameControllerTest {
+public class ITGameControllerTest {
 
     private String playerId;
     private Player p1;

@@ -16,7 +16,7 @@ public class Board {
     public Board(int height, int width) {
         this.height = height;
         this.width = width;
-        this.grid = new TreeMap<String, List<String>>();
+        this.grid = new TreeMap<>();
         this.initBoard();
     }
 
