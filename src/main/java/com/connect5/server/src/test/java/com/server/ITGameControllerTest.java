@@ -1,36 +1,39 @@
-package com.connect5;
+package com.server;
 
-import com.connect5.game.Game;
-import com.connect5.game.GameRepository;
-import com.connect5.player.Player;
-import com.connect5.player.PlayerRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jayway.jsonpath.JsonPath;
+import com.server.game.Game;
+import com.server.game.GameRepository;
+import com.server.player.Player;
+import com.server.player.PlayerRepository;
 import org.hamcrest.Matchers;
 import org.hamcrest.core.IsNull;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.context.annotation.ComponentScan;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-
-import org.springframework.test.web.servlet.MvcResult;
-
-import java.util.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
 @AutoConfigureMockMvc
-@ComponentScan(basePackages = "com.connect5")
+@ActiveProfiles("test")
 public class ITGameControllerTest {
 
     private String playerId;
@@ -164,7 +167,6 @@ public class ITGameControllerTest {
                 .andExpect(jsonPath("$.turnToken").value(userName))
                 .andExpect(jsonPath("$.players", Matchers.hasEntry(userName, "z")))
                 .andExpect(jsonPath("$.grid.5", Matchers.hasItem("z")));
-
     }
 
     public static String asJsonString(final Object obj) {

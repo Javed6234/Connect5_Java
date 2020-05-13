@@ -1,4 +1,4 @@
-package com.connect5.game;
+package com.server.game;
 
 import org.socialsignin.spring.data.dynamodb.repository.EnableScan;
 import org.springframework.data.repository.CrudRepository;

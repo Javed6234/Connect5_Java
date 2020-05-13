@@ -1,7 +1,7 @@
-package com.connect5.client;
+package com.client;
 
-import com.connect5.game.Game;
-import com.connect5.player.Player;
+import com.client.Player;
+import com.client.Game;
 import org.springframework.http.*;
 import org.springframework.web.client.RestTemplate;
 
@@ -59,10 +59,15 @@ public class Client {
         return null;
     }
 
-    private void displayGrid(Map<String, List<String>> grid) {
+    private void displayGrid(Map<String, List<String>> grid, int width) {
         for (Map.Entry<String, List<String>> entry : grid.entrySet()) {
             System.out.println(entry.getKey() + ": " + entry.getValue());
         }
+        System.out.print("    ");
+        for(int col = 0; col < width; col++) {
+            System.out.print(col + "  ");
+        }
+        System.out.println();
     }
 
     public static void main(String [] args) throws IOException, InterruptedException {
@@ -85,7 +90,7 @@ public class Client {
                     continue;
                 }
                 if (game.getTurnToken().equals(userName)) {
-                    client.displayGrid(game.getGrid());
+                    client.displayGrid(game.getGrid(), game.getBoardWidth());
 
                     System.out.print("Enter any column: ");
                     int column = scan.nextInt();

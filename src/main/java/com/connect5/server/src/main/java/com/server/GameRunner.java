@@ -1,32 +1,30 @@
-package com.connect5;
+package com.server;
 
+import com.amazonaws.SdkClientException;
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDB;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapper;
 import com.amazonaws.services.dynamodbv2.model.CreateTableRequest;
 import com.amazonaws.services.dynamodbv2.model.ProvisionedThroughput;
 import com.amazonaws.services.dynamodbv2.util.TableUtils;
-import com.connect5.game.Game;
-import com.connect5.game.GameRepository;
-import com.connect5.player.Player;
-import com.connect5.player.PlayerRepository;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.server.game.Game;
+import com.server.game.GameRepository;
+import com.server.player.Player;
+import com.server.player.PlayerRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.annotation.Profile;
+import org.springframework.stereotype.Component;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-@SpringBootApplication
-public class App implements CommandLineRunner{
-
-    public static void main(String[] args) {
-        SpringApplication.run(App.class, args);
-    }
+@Profile("!test")
+@Component
+public class GameRunner implements CommandLineRunner {
 
     @Autowired
     AmazonDynamoDB amazonDynamoDB;
@@ -61,7 +59,16 @@ public class App implements CommandLineRunner{
         tableRequest.setProvisionedThroughput(
                 new ProvisionedThroughput(1L, 1L));
 
-        TableUtils.createTableIfNotExists(amazonDynamoDB, tableRequest);
+        try{
+            TableUtils.createTableIfNotExists(amazonDynamoDB, tableRequest);
+        } catch (SdkClientException e){
+            System.out.println("****************************");
+            System.out.println();
+            System.out.println("DynamoDB needs to be running");
+            System.out.println();
+            System.out.println("****************************");
+            System.exit(1);
+        }
     }
 
     private void demoCustomInterface(PlayerRepository playerRepository) {
@@ -114,8 +121,7 @@ public class App implements CommandLineRunner{
 
         System.out.println();
         for (Game gameObject : games) {
-           System.out.println("Game object: " + basicGson.toJson(gameObject));
+            System.out.println("Game object: " + basicGson.toJson(gameObject));
         }
     }
-
 }

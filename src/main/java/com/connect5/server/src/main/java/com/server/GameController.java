@@ -1,14 +1,17 @@
-package com.connect5;
+package com.server;
 
-import com.connect5.game.Game;
-import com.connect5.game.GameRepository;
-import com.connect5.player.Player;
-import com.connect5.player.PlayerRepository;
 import com.google.gson.Gson;
+import com.server.game.Game;
+import com.server.game.GameRepository;
+import com.server.player.Player;
+import com.server.player.PlayerRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 @RestController
 public class GameController {

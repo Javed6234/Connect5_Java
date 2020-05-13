@@ -1,4 +1,4 @@
-package com.connect5;
+package com.server;
 
 import com.amazonaws.auth.AWSCredentials;
 import com.amazonaws.auth.AWSCredentialsProvider;
@@ -18,7 +18,7 @@ import org.springframework.context.annotation.Primary;
 
 
 @Configuration
-@EnableDynamoDBRepositories(basePackages = "com.connect5")
+@EnableDynamoDBRepositories(basePackages = "com.server")
 public class DynamoDBConfig {
 
     @Value("${amazon.dynamodb.endpoint}")

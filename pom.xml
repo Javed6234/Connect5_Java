@@ -13,6 +13,11 @@
         <version>2.2.2.RELEASE</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
+    <packaging>pom</packaging>
+    <modules>
+        <module>src/main/java/com/connect5/client</module>
+        <module>src/main/java/com/connect5/server</module>
+    </modules>
     <dependencies>
         <dependency>
             <groupId>io.github.boostchicken</groupId>
@@ -49,88 +54,18 @@
     </dependencies>
     <build>
         <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-shade-plugin</artifactId>
-                <version>2.4.1</version>
-                <executions>
-                    <execution>
-                        <id>build-first</id>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>shade</goal>
-                        </goals>
-                        <configuration>
-                            <transformers>
-                                <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-                                    <mainClass>com.connect5.App</mainClass>
-                                </transformer>
-                            </transformers>
-                            <finalName>server</finalName>
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <id>build-second</id>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>shade</goal>
-                        </goals>
-                        <configuration>
-                            <transformers>
-                                <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-                                    <mainClass>com.connect5.client.Client</mainClass>
-                                </transformer>
-                            </transformers>
-                            <finalName>client</finalName>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-failsafe-plugin</artifactId>
-                <version>3.0.0-M3</version>
-                <configuration>
-                    <includes>
-                        <include>**/IT*.java</include>
-                    </includes>
-                </configuration>
-            </plugin>
 
-            <plugin>
-                <artifactId>maven-dependency-plugin</artifactId>
-                <version>2.8</version>
-                <executions>
-                    <execution>
-                        <id>unpack-dynamodb-local</id>
-                        <goals>
-                            <goal>unpack</goal>
-                        </goals>
-                        <configuration>
-                            <artifactItems>
-                                <artifactItem>
-                                    <groupId>com.jcabi</groupId>
-                                    <artifactId>DynamoDBLocal</artifactId>
-                                    <version>2013-09-12</version>
-                                    <type>zip</type>
-                                    <outputDirectory>${project.build.directory}/dynamodb-dist</outputDirectory>
-                                    <overWrite>false</overWrite>
-                                </artifactItem>
-                            </artifactItems>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
+            <!-- Reserve an open port for dynamodb_local. -->
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>build-helper-maven-plugin</artifactId>
-                <version>1.8</version>
+                <version>1.9.1</version>
                 <executions>
                     <execution>
-                        <id>reserver-dynamodb-port</id>
                         <goals>
                             <goal>reserve-network-port</goal>
                         </goals>
+                        <phase>initialize</phase>
                         <configuration>
                             <portNames>
                                 <portName>dynamodblocal.port</portName>
@@ -139,36 +74,94 @@
                     </execution>
                 </executions>
             </plugin>
+
             <plugin>
-                <groupId>com.jcabi</groupId>
-                <artifactId>jcabi-dynamodb-maven-plugin</artifactId>
-                <version>0.9.1</version>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-failsafe-plugin</artifactId>
+                <version>3.0.0-M4</version>
+                <configuration>
+                    <includes>**/IT*.java</includes>
+                    <systemPropertyVariables>
+                        <amazon.dynamodb.endpoint>http://localhost:${dynamodblocal.port}</amazon.dynamodb.endpoint>
+                    </systemPropertyVariables>
+                </configuration>
                 <executions>
                     <execution>
-                        <id>dynamodb-integration-test</id>
                         <goals>
-                            <goal>start</goal>
-                            <goal>stop</goal>
+                            <goal>integration-test</goal>
+                            <goal>verify</goal>
                         </goals>
-                        <configuration>
-                            <port>${dynamodblocal.port}</port>
-                            <dist>${project.build.directory}/dynamodb-dist</dist>
-                        </configuration>
                     </execution>
                 </executions>
             </plugin>
+
+            <plugin>
+                <groupId>com.googlecode.maven-download-plugin</groupId>
+                <artifactId>download-maven-plugin</artifactId>
+                <version>1.2.0</version>
+                <configuration>
+                    <url>https://s3.eu-central-1.amazonaws.com/dynamodb-local-frankfurt/dynamodb_local_latest.tar.gz</url>
+                    <outputFileName>dynamodb_local.tar.gz</outputFileName>
+                    <unpack>true</unpack>
+                    <outputDirectory>${project.build.directory}/dynamodb-dist</outputDirectory>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>install-dynamodblocal</id>
+                        <phase>pre-integration-test</phase>
+                        <goals>
+                            <goal>wget</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>com.bazaarvoice.maven.plugins</groupId>
+                <artifactId>process-exec-maven-plugin</artifactId>
+                <version>0.7</version>
+                <configuration>
+                    <name>dynamodb_local</name>
+                    <waitAfterLaunch>5</waitAfterLaunch>
+                    <arguments>
+                        <argument>java</argument>
+                        <argument>-Djava.library.path=dynamodb-dist/DynamoDBLocal_lib</argument>
+                        <argument>-jar</argument>
+                        <argument>dynamodb-dist/DynamoDBLocal.jar</argument>
+
+                        <argument>-port</argument>
+                        <argument>${dynamodblocal.port}</argument>
+                    </arguments>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>dynamodb_local</id>
+                        <phase>pre-integration-test</phase>
+                        <goals>
+                            <goal>start</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>stop-all</id>
+                        <phase>post-integration-test</phase>
+                        <goals>
+                            <goal>stop-all</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>2.14</version>
+                <configuration>
+                    <!-- skips surefire tests without skipping failsafe tests.
+                             Property value seems to magically default to false -->
+                    <!--suppress UnresolvedMavenProperty -->
+                    <skipTests>${skip.surefire.tests}</skipTests>
+                </configuration>
+            </plugin>
+
         </plugins>
-        <pluginManagement>
-            <plugins>
-                <plugin>
-                    <artifactId>maven-failsafe-plugin</artifactId>
-                    <configuration>
-                        <systemPropertyVariables>
-                            <dynamodb.port>${dynamodblocal.port}</dynamodb.port>
-                        </systemPropertyVariables>
-                    </configuration>
-                </plugin>
-            </plugins>
-        </pluginManagement>
     </build>
 </project>
