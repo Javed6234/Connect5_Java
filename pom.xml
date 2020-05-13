@@ -15,8 +15,8 @@
     </parent>
     <packaging>pom</packaging>
     <modules>
-        <module>src/main/java/com/connect5/client</module>
-        <module>src/main/java/com/connect5/server</module>
+        <module>client</module>
+        <module>server</module>
     </modules>
     <dependencies>
         <dependency>
